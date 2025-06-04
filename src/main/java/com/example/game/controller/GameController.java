@@ -28,18 +28,6 @@ public class GameController {
         return gameService.getGame();
     }
 
-    @GetMapping("/")
-    public String showGame() {
-        System.out.println("Redirecting from / to /game");
-        return "redirect:/game";
-    }
-    
-    @GetMapping("/game")
-    public String getGameTemplate() {
-        System.out.println("Rendering game.html template");
-        return "game";
-    }
-
     @PostMapping("/api/game/move")
     public Map<String, Object> makeMove(@RequestParam String direction) {
         Map<String, Object> response = new HashMap<>();
