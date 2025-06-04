@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>2048 Game</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <script>
+        function sendMove(direction) {
+            fetch('/api/game/move?direction=' + direction, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    updateBoard(data.game.board);
+                    document.getElementById('score').innerText = data.game.score;
+                    if (data.game.gameOver) {
+                        alert('Game Over!');
+                    }
+                });
+        }
+
+        function resetGame() {
+            fetch('/api/game/reset', { method: 'POST' })
+                .then(response => response.json())
+                .then(game => {
+                    updateBoard(game.board);
+                    document.getElementById('score').innerText = game.score;
+                });
+        }
+
+        function updateBoard(board) {
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 4; col++) {
+                    let cell = document.getElementById('cell-' + row + '-' + col);
+                    cell.className = 'cell';
+                    cell.innerText = board[row][col] === 0 ? '' : board[row][col];
+                    if (board[row][col] !== 0) {
+                        cell.classList.add('tile-' + board[row][col]);
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>2048 Game</h1>
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="game-board">
+            <div class="board-row" th:each="row, rowStat : ${game.board}">
+                <div class="cell" th:each="cell, colStat : ${row}" 
+                     th:id="'cell-' + ${rowStat.index} + '-' + ${colStat.index}"
+                     th:text="${cell == 0 ? '' : cell}"></div>
+            </div>
+        </div>
+        <div class="controls">
+            <button onclick="sendMove('up')">↑ Up</button>
+            <button onclick="sendMove('left')">← Left</button>
+            <button onclick="sendMove('right')">→ Right</button>
+            <button onclick="sendMove('down')">↓ Down</button>
+        </div>
+        <button onclick="resetGame()">Restart Game</button>
+    </div>
+</body>
+</html>
